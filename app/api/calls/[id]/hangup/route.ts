@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import { getSession, updateSession } from "@/lib/calls/store";
+import { getTwilioClient } from "@/lib/twilio/client";
+import { analyzeTranscript, extractCandidateData, generateCallSummary } from "@/lib/ai/groq";
+export async function POST(_: Request, { params }: { params:Promise<{id:string}> }) { try { const {id}=await params; const session=getSession(id); if(!session) return NextResponse.json({error:"Call not found."},{status:404}); if(session.twilioCallSid) await getTwilioClient().calls(session.twilioCallSid).update({status:"completed"}); const transcript=session.transcript.map(item=>`${item.speaker}: ${item.text}`).join("\n"); const [analysis, extracted, summary]=await Promise.all([analyzeTranscript(transcript),extractCandidateData(transcript),generateCallSummary(transcript)]); return NextResponse.json(updateSession(id,{status:"COMPLETED",endedAt:new Date().toISOString(),analysis:{...analysis,summary:summary.summary},extractedData:extracted})); } catch(error){return NextResponse.json({error:error instanceof Error?error.message:"Unable to finalize call."},{status:500});} }
