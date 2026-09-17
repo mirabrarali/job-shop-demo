@@ -19,12 +19,12 @@ Set these in Vercel:
 ```env
 GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-2.5-flash
-GEMINI_LIVE_MODEL=gemini-2.5-flash-native-audio-preview-12-2025
+GEMINI_LIVE_MODEL=gemini-3.8-live
 ```
 
 `GEMINI_API_KEY` is server-side only. Do not add it to client-exposed variables.
 
-Get a key from [Google AI Studio](https://aistudio.google.com/apikey). Gemini API availability and free-tier quotas depend on the model, account, region, and current Google AI Studio terms. `GEMINI_LIVE_MODEL` controls the low-latency audio model. The default is `gemini-2.5-flash-native-audio-preview-12-2025`; use a currently available Live model in your account if this preview is unavailable.
+Get a key from [Google AI Studio](https://aistudio.google.com/apikey). Gemini API availability and free-tier quotas depend on the model, account, region, and current Google AI Studio terms. `GEMINI_LIVE_MODEL` controls the low-latency audio model. The default is the current `gemini-3.8-live` model.
 
 ## Run locally
 
