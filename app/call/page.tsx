@@ -1,13 +1,18 @@
 "use client";
-import { FormEvent, useState } from "react";
-import { PhoneCall } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ArrowUpRight, Mic, MonitorUp } from "lucide-react";
 
 export default function CallForm() {
-  const router = useRouter();
-  const [phone, setPhone] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  async function submit(event: FormEvent) { event.preventDefault(); setError(""); setLoading(true); const result = await fetch("/api/calls/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone }) }); const data = await result.json(); setLoading(false); if (!result.ok) { const code = data.code ? ` (code ${data.code})` : ""; const info = data.moreInfo ? ` More info: ${data.moreInfo}` : ""; setError(`${data.error || "Unable to start the call."}${code}${info}`); return; } router.push(`/call/${data.callId}`); }
-  return <main className="page"><div className="page-header"><div><p className="eyebrow">New screening call</p><h1 className="page-title">Call a candidate</h1><p className="page-subtitle">Enter a mobile number. The recruiter will collect the candidate and job details during the conversation.</p></div></div><form className="panel single-call-form" onSubmit={submit}><div className="field"><label htmlFor="phone">Indian mobile number</label><input id="phone" required value={phone} onChange={event => setPhone(event.target.value)} placeholder="9876543210" autoComplete="tel" /></div><div className="form-footer"><span className="form-note">Use a 10-digit number or include the +91 country code.</span><button className="button button-primary" disabled={loading} type="submit"><PhoneCall size={17} />{loading ? "Starting call…" : "Start call"}</button></div>{error && <p className="error">{error}</p>}</form></main>;
+  const [error, setError] = useState("");
+  async function startScreening() {
+    const screeningWindow = window.open("about:blank", "jobshop-screening", "popup,width=1440,height=960");
+    setLoading(true); setError("");
+    const response = await fetch("/api/calls/start", { method: "POST" });
+    const data = await response.json();
+    setLoading(false);
+    if (!response.ok) { screeningWindow?.close(); setError(data.error || "Unable to start screening."); return; }
+    if (screeningWindow) screeningWindow.location.href = `/call/${data.callId}`;
+  }
+  return <main className="page"><div className="call-landing"><div className="call-landing-copy"><p className="eyebrow">Browser voice workspace</p><h1 className="page-title">A calmer way to screen.</h1><p className="page-subtitle">Open a focused candidate conversation in a separate window. The recruiter asks the questions, listens to spoken answers, and builds the profile as the conversation unfolds.</p><button className="button button-primary call-launch" onClick={startScreening} disabled={loading}><Mic size={18} /> {loading ? "Opening screening…" : "Start screening"} <ArrowUpRight size={17} /></button>{error && <p className="error">{error}</p>}<p className="form-note">Allow microphone access when the screening window opens.</p></div><div className="call-preview"><div className="preview-top"><span className="preview-live" /> SCREENING ROOM <span>00:00</span></div><div className="preview-orb"><Mic size={28} /></div><strong>Candidate conversation</strong><span>Voice and transcript in one place</span><div className="preview-lines"><i /><i /><i /><i /><i /></div></div></div><section className="screening-principles"><div><MonitorUp size={19} /><strong>Recruiter view</strong><span>Transcript, stages, and profile details stay visible.</span></div><div><Mic size={19} /><strong>Natural answers</strong><span>Speak normally. The browser turns responses into text.</span></div></section></main>;
 }

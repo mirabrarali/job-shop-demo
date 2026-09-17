@@ -1,2 +1,0 @@
-export function normalizeIndianPhone(input: string) { const digits = input.replace(/[\s()-]/g, ""); if (/^\+91[6-9]\d{9}$/.test(digits)) return digits; if (/^91[6-9]\d{9}$/.test(digits)) return `+${digits}`; if (/^[6-9]\d{9}$/.test(digits)) return `+91${digits}`; throw new Error("Enter a valid 10-digit Indian mobile number."); }
-export function twilioConfigured() { return Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER); }

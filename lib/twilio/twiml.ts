@@ -1,3 +1,0 @@
-import twilio from "twilio";
-export function voiceResponse() { return new twilio.twiml.VoiceResponse(); }
-export function gatherSpeech(response: twilio.twiml.VoiceResponse, prompt: string, callId: string) { const gather = response.gather({ input:["speech"], action:`${process.env.NEXT_PUBLIC_BASE_URL}/api/twilio/gather?callId=${encodeURIComponent(callId)}`, method:"POST", speechTimeout:"auto", timeout:5, language:"en-IN" }); gather.say({ voice:"alice", language:"en-IN" }, prompt); response.say({ voice:"alice", language:"en-IN" }, "I did not hear a response. We can continue when you are ready."); response.redirect({ method:"POST" }, `${process.env.NEXT_PUBLIC_BASE_URL}/api/twilio/voice?callId=${encodeURIComponent(callId)}`); return response; }

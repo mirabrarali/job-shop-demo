@@ -1,8 +1,0 @@
-import Groq from "groq-sdk";
-import { CallAnalysis } from "@/lib/types";
-function client() { if (!process.env.GROQ_API_KEY) throw new Error("Groq is not configured. Add GROQ_API_KEY to generate AI responses."); return new Groq({ apiKey: process.env.GROQ_API_KEY }); }
-async function json<T>(system: string, user: string): Promise<T> { const result = await client().chat.completions.create({ model: process.env.GROQ_MODEL || "llama-3.1-8b-instant", temperature:.2, response_format:{ type:"json_object" }, messages:[{ role:"system", content:system }, { role:"user", content:user }] }); return JSON.parse(result.choices[0]?.message?.content || "{}"); }
-export async function generateRecruiterResponse(context: string) { return json<{ response:string; stage:string; done:boolean }>("You are JobShop AI Recruiter. Be concise, professional, friendly, and ask exactly one short question. Return JSON with response, stage, done. Never invent candidate facts.", context); }
-export async function extractCandidateData(transcript: string) { return json<Record<string,string|number|null>>("Extract only facts explicitly present in this recruitment transcript. Use null for unknown. Return JSON only.", transcript); }
-export async function analyzeTranscript(transcript: string): Promise<CallAnalysis> { return json<CallAnalysis>("Analyze only observable job-relevant communication in this transcript. Do not assess accent, nationality, age, gender, health, or personality. Return the requested scores and concise arrays as JSON.", transcript); }
-export async function generateCallSummary(transcript: string) { return json<{ summary:string }>("Summarize this real recruitment call in two concise sentences. Do not invent facts. Return JSON with summary.", transcript); }
