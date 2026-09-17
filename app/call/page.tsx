@@ -11,14 +11,17 @@ export default function CallForm() {
     const screeningWindow = window.open("about:blank", "jobshop-screening", "popup,width=1440,height=960");
     setLoading(true); setError("");
     try {
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error("Microphone access is not supported in this browser. Use Chrome or Edge over HTTPS.");
+      const microphone = await navigator.mediaDevices.getUserMedia({ audio: true });
+      microphone.getTracks().forEach(track => track.stop());
       const response = await fetch("/api/calls/start", { method: "POST" });
       const data = await response.json();
       if (!response.ok) { screeningWindow?.close(); setError(data.error || "Unable to start screening."); return; }
       if (screeningWindow) screeningWindow.location.href = `/call/${data.callId}`;
       else router.push(`/call/${data.callId}`);
-    } catch {
+    } catch (caughtError) {
       screeningWindow?.close();
-      setError("Unable to open the screening room. Check your connection and try again.");
+      setError(caughtError instanceof DOMException && caughtError.name === "NotAllowedError" ? "Microphone permission was denied. Allow microphone access in your browser site settings and try again." : caughtError instanceof Error ? caughtError.message : "Unable to open the screening room. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
