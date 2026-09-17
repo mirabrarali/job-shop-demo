@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { ArrowUpRight, Mic, MonitorUp } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function CallForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   async function startScreening() {
@@ -13,7 +15,7 @@ export default function CallForm() {
       const data = await response.json();
       if (!response.ok) { screeningWindow?.close(); setError(data.error || "Unable to start screening."); return; }
       if (screeningWindow) screeningWindow.location.href = `/call/${data.callId}`;
-      else window.location.assign(`/call/${data.callId}`);
+      else router.push(`/call/${data.callId}`);
     } catch {
       screeningWindow?.close();
       setError("Unable to open the screening room. Check your connection and try again.");
