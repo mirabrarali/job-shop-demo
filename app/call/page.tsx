@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ArrowUpRight, Mic, MonitorUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { saveBrowserSession } from "@/lib/browser-sessions";
 
 export default function CallForm() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function CallForm() {
       const response = await fetch("/api/calls/start", { method: "POST" });
       const data = await response.json();
       if (!response.ok) { screeningWindow?.close(); setError(data.error || "Unable to start screening."); return; }
+      if (data.session) saveBrowserSession(data.session);
       if (screeningWindow) screeningWindow.location.href = `/call/${data.callId}`;
       else router.push(`/call/${data.callId}`);
     } catch (caughtError) {
