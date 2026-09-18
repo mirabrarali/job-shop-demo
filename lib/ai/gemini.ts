@@ -21,3 +21,10 @@ export async function generateScreeningTurn(candidate: Candidate, transcript: st
 export async function analyzeTranscript(transcript: string): Promise<CallAnalysis> {
   return json<CallAnalysis>("Analyze only observable job-relevant communication in this transcript. Do not assess accent, nationality, age, gender, health, disability, appearance, or personality. Return valid JSON with scores from 0 to 100 and concise arrays.", transcript);
 }
+
+export async function finalizeScreening(candidate: Candidate, transcript: string) {
+  return json<{ candidate: Partial<Candidate>; analysis: CallAnalysis }>(
+    "You are finalizing a recruitment screening. Extract only facts explicitly present in the transcript and analyze only observable job-relevant communication. Do not assess accent, nationality, age, gender, health, disability, appearance, or personality. Return JSON with candidate and analysis. Use null for unknown candidate fields. The analysis must include grammarRating, grammarScore, grammarObservations, communicationRating, communicationScore, fluencyRating, clarityRating, fillerWords, strengths, concerns, interest, disposition, and summary.",
+    `Candidate profile before finalization: ${JSON.stringify(candidate)}\nComplete transcript:\n${transcript}`
+  );
+}
